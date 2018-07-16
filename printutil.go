@@ -7,40 +7,50 @@ import (
 	"github.com/fatih/color"
 )
 
-// Scene holds the info about a given point in the storyline
-type Scene struct {
-	id           string
-	season       string
-	day          string
-	timeOfDay    string
-	sceneIntro   string
-	speakers     []string
-	promptIntros []string
-	prompts      []string
-	answers      []string
+func printSpeakerName(speaker string) string {
+	cyan := color.New(color.FgCyan).SprintFunc()
+	speakerNameFormatted := fmt.Sprintf("%s", cyan(speaker))
+	return speakerNameFormatted
 }
 
-func printScene(scene Scene, sceneSection int) {
+func playScene(scene Scene) {
+
+	printSetting(scene)
+	printSceneIntro(scene.sceneIntro)
+
+	for _, prompt := range scene.prompts {
+		printPrompt(prompt)
+		in := getInput()
+		compareInput(in, prompt.answer)
+	}
+
+}
+
+func printSceneIntro(sceneIntro string) {
+	fmt.Printf(sceneIntro)
+}
+
+func printSetting(scene Scene) {
+	d := color.New(color.FgMagenta, color.Bold)
 
 	fmt.Printf("\n\n\n=========================\n")
-	fmt.Printf("%s - %s - %s\n", strings.ToUpper(scene.season), strings.ToUpper(scene.day), strings.ToUpper(scene.timeOfDay))
+	d.Printf("%s - %s - %s\n", strings.ToUpper(scene.season), strings.ToUpper(scene.day), strings.ToUpper(scene.timeOfDay))
 	fmt.Printf("=========================\n\n")
-
-	fmt.Printf(scene.sceneIntro)
-
-	printPrompt(scene, sceneSection)
 }
 
-func printPrompt(scene Scene, sceneSection int) {
-	fmt.Printf("\n%s\n\n", scene.promptIntros[sceneSection])
+func printPrompt(prompt Prompt) {
 
-	printDialogue(scene.speakers[sceneSection], scene.prompts[sceneSection])
+	printPromptIntro(prompt.intro)
+	printPromptText(prompt.speaker, prompt.text)
+}
+
+func printPromptIntro(intro string) {
+	magenta := color.New(color.FgMagenta, color.Bold).SprintFunc()
+	fmt.Printf("\n%s\n\n", magenta(intro))
 }
 
 // prints "Speaker Name: Text"
-func printDialogue(speaker string, text string) {
-	cyan := color.New(color.FgCyan).SprintFunc()
+func printPromptText(speaker string, text string) {
 	white := color.New(color.FgWhite, color.Bold).SprintFunc()
-
-	fmt.Printf("%s: %s。\n\n", cyan(speaker), white(text))
+	fmt.Printf("%v: %s。\n\n", printSpeakerName(speaker), white(text))
 }
